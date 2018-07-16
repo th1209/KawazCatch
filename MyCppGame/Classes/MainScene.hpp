@@ -14,8 +14,11 @@ class MainScene : public cocos2d::Layer {
 public:
     static cocos2d::Scene* createScene();
     CREATE_FUNC(MainScene);
-    CC_SYNTHESIZE_RETAIN(cocos2d::Sprite*, _player, Player);
+
     CC_SYNTHESIZE(cocos2d::Vector<cocos2d::Sprite*>, _fruits, Fruits);
+    CC_SYNTHESIZE(int, _score, Score);
+    CC_SYNTHESIZE_RETAIN(cocos2d::Sprite*, _player, Player);
+    CC_SYNTHESIZE_RETAIN(cocos2d::Label*, _scoreLabel, ScoreLabel);
     
     virtual void update(float delta);
 

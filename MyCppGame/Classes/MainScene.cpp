@@ -13,13 +13,17 @@ const float kFruitTopMargin = 80.0f;
 const int kFruitSpawnRate = 20;
 
 MainScene::MainScene()
-: _player(NULL)
+: _fruits(Vector<cocos2d::Sprite*>())
+, _score(0)
+, _player(NULL)
+, _scoreLabel(NULL)
 {
 }
 
 MainScene::~MainScene()
 {
     CC_SAFE_RELEASE_NULL(_player);
+    CC_SAFE_RELEASE_NULL(_scoreLabel);
 }
 
 Scene* MainScene::createScene()
@@ -76,6 +80,21 @@ bool MainScene::init()
         _player->setPosition(newPosition);
     };
     director->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+    
+    // スコアラベル
+    float fontSize = 32.0f;
+    auto _scoreLabel = Label::createWithSystemFont(StringUtils::toString(_score), "Marker Felt", fontSize);
+    this->setScoreLabel(_scoreLabel);
+    _scoreLabel->enableShadow(Color4B::BLACK, Size(0.5f, 0.5f), 6);
+    _scoreLabel->enableOutline(Color4B::BLACK, 3);
+    _scoreLabel->setPosition(Vec2(winSize.width / 2.0f * 1.5f, winSize.height - 150));
+    this->addChild(_scoreLabel);
+    
+    auto scoreLabelHeader = Label::createWithSystemFont("SCORE", "Marker Felt", fontSize);
+    scoreLabelHeader->enableShadow(Color4B::BLACK, Size(0.5f, 0.5f), 6);
+    scoreLabelHeader->enableOutline(Color4B::BLACK, 3);
+    scoreLabelHeader->setPosition(Vec2(winSize.width / 2.0f * 1.5f, winSize.height - 120));
+    this->addChild(scoreLabelHeader);
     
     // 毎フレupdateを呼ぶ
     this->scheduleUpdate();
@@ -146,6 +165,8 @@ bool MainScene::removeFruit(Sprite* fruit)
 
 void MainScene::catchFruit(Sprite* fruit)
 {
-    // 一旦フルーツを削除するだけ
     this->removeFruit(fruit);
+    
+    _score += 1;
+    _scoreLabel->setString(StringUtils::toString(_score));
 }
