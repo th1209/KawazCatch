@@ -225,7 +225,8 @@ void MainScene::onResult()
                                               "replay_button_pressed.png",
                                               [](Ref* ref) {
                                                   auto scene = MainScene::createScene();
-                                                  Director::getInstance()->replaceScene(scene);
+                                                  auto transition = TransitionFade::create(0.5, scene);
+                                                  Director::getInstance()->replaceScene(transition);
                                               });
     auto titleButton = MenuItemImage::create("title_button.png",
                                              "title_button_pressed.png",
