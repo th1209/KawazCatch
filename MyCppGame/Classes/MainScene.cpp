@@ -6,6 +6,7 @@
 //
 
 #include "MainScene.hpp"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -157,6 +158,13 @@ void MainScene::update(float delta)
     }
 }
 
+void MainScene::onEnterTransitionDidFinish()
+{
+    Layer::onEnterTransitionDidFinish();
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("main.mp3", true);
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("effect.mp3");
+}
+
 Sprite* MainScene::addFruit()
 {
     // フルーツをランダム生成
@@ -207,6 +215,8 @@ void MainScene::catchFruit(Sprite* fruit)
     
     _score += 1;
     _scoreLabel->setString(StringUtils::toString(_score));
+    
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("catch_fruit.mp3");
 }
 
 void MainScene::onResult()
@@ -224,6 +234,8 @@ void MainScene::onResult()
     auto replayButton = MenuItemImage::create("replay_button.png",
                                               "replay_button_pressed.png",
                                               [](Ref* ref) {
+                                                  CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("decide.mp3");
+                                                  
                                                   auto scene = MainScene::createScene();
                                                   auto transition = TransitionFade::create(0.5, scene);
                                                   Director::getInstance()->replaceScene(transition);
@@ -232,9 +244,12 @@ void MainScene::onResult()
                                              "title_button_pressed.png",
                                              [](Ref* ref) {
                                                  // 後で実装する.
+                                                 CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("decide.mp3");
                                              });
     auto menu = Menu::create(replayButton, titleButton, NULL);
     menu->alignItemsVerticallyWithPadding(15);
     menu->setPosition(Vec2(winSize.width / 2.0f, winSize.height / 2.0f));
     this->addChild(menu);
+    
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("finish.mp3");
 }

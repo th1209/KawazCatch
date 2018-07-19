@@ -30,7 +30,8 @@ public:
     CC_SYNTHESIZE_RETAIN(cocos2d::Label*, _scoreLabel, ScoreLabel);
     CC_SYNTHESIZE_RETAIN(cocos2d::Label*, _secondLabel, SecondLabel);
     
-    virtual void update(float delta);
+    void update(float delta);
+    void onEnterTransitionDidFinish() override;
 
 protected:
     MainScene();
