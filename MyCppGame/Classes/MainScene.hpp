@@ -14,7 +14,9 @@ class MainScene : public cocos2d::Layer {
 private:
     enum class GameState
     {
+        kReady,
         kPlaying,
+        kEnding,
         kResult
     };
 
@@ -52,6 +54,7 @@ private:
         kCount
     };
     
+    void addReadyLabel();
     cocos2d::Sprite* addFruit();
     bool removeFruit(cocos2d::Sprite* fruit);
     void catchFruit(cocos2d::Sprite* fruit);

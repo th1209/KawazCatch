@@ -13,7 +13,7 @@ USING_NS_CC;
 
 const float kFruitTopMargin = 80.0f;
 const int kFruitSpawnRate = 20;
-const float kTimeLimitSecond = 10.0f;
+const float kTimeLimitSecond = 2.0f;
 const int kNormalFruitScore = 1;
 const int kGoldenFruitScore = 5;
 const int kBombPenaltyScore = -4;
@@ -23,7 +23,7 @@ MainScene::MainScene()
 , _score(0)
 , _isCrash(false)
 , _second(kTimeLimitSecond)
-, _state(GameState::kPlaying)
+, _state(GameState::kReady)
 , _player(NULL)
 , _scoreLabel(NULL)
 , _secondLabel(NULL)
@@ -158,8 +158,27 @@ void MainScene::update(float delta)
         
         // 残り時間判定
         if (_second < 0) {
-            _state = GameState::kResult;
-            this->onResult();
+            _state = GameState::kEnding;
+            
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("finish.mp3");
+            
+            auto finish = Sprite::create("finish.png");
+            auto winSize = Director::getInstance()->getWinSize();
+            finish->setPosition(Vec2(winSize.width / 2.0f, winSize.height / 2.0f));
+            finish->setScale(0);
+            
+            auto appear = EaseExponentialIn::create(ScaleTo::create(0.25f, 1.0f));
+            auto disappear = EaseExponentialIn::create(ScaleTo::create(0.25f, 0.0f));
+            finish->runAction(Sequence::create(appear,
+                                               DelayTime::create(2.0f),
+                                               disappear,
+                                               CallFunc::create([this]() -> void{
+                                                   _state = GameState::kResult;
+                                                   this->onResult();
+                                               }),
+                                               RemoveSelf::create(),
+                                               NULL));
+            this->addChild(finish);
         }
     }
 }
@@ -168,7 +187,41 @@ void MainScene::onEnterTransitionDidFinish()
 {
     Layer::onEnterTransitionDidFinish();
     CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("main.mp3", true);
-    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("effect.mp3");
+    this->addReadyLabel();
+}
+
+void MainScene::addReadyLabel()
+{
+    auto director = Director::getInstance();
+    auto winSize = director->getWinSize();
+    auto center = Vec2(winSize.width/2.0f, winSize.height/2.0f);
+    
+    // スタートボタン.
+    auto start = Sprite::create("start.png");
+    auto startAction1 = CCSpawn::create(EaseIn::create(ScaleTo::create(0.5f, 5.0f), 0.5f),
+                                       FadeOut::create(0.5f),
+                                       NULL
+    );
+    start->setPosition(center);
+    start->retain();
+    start->runAction(Sequence::create(startAction1, RemoveSelf::create(), NULL));
+    
+    
+    // レディボタン.
+    auto ready = Sprite::create("ready.png");
+    ready->setScale(0.0f);
+    ready->setPosition(center);
+    ready->runAction(Sequence::create(ScaleTo::create(0.25f, 1.0f),
+                                      DelayTime::create(1.0f),
+                                      CallFunc::create([this, start]()->void{
+                                          // addChildした時点でActionが実行される.
+                                          this->addChild(start);
+                                          _state = GameState::kPlaying;
+                                          CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("play.mp3");
+                                      }),
+                                      RemoveSelf::create(),
+                                      NULL));
+    this->addChild(ready);
 }
 
 Sprite* MainScene::addFruit()
