@@ -25,6 +25,7 @@ public:
     CC_SYNTHESIZE(cocos2d::Vector<cocos2d::Sprite*>, _fruits, Fruits);
     CC_SYNTHESIZE(int, _score, Score);
     CC_SYNTHESIZE(float, _second, Second);
+    CC_SYNTHESIZE(bool, _isCrash, IsCrash);
     CC_SYNTHESIZE(GameState, _state, State);
     CC_SYNTHESIZE_RETAIN(cocos2d::Sprite*, _player, Player);
     CC_SYNTHESIZE_RETAIN(cocos2d::Label*, _scoreLabel, ScoreLabel);
@@ -46,12 +47,15 @@ private:
         kOrange,
         kBanana,
         kCherry,
+        kGolden,
+        kBomb,
         kCount
     };
     
     cocos2d::Sprite* addFruit();
     bool removeFruit(cocos2d::Sprite* fruit);
     void catchFruit(cocos2d::Sprite* fruit);
+    void onCatchBomb();
     void onResult();
 };
 

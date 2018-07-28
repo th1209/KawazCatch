@@ -6,6 +6,7 @@
 //
 
 #include "MainScene.hpp"
+#include "TitleScene.hpp"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
@@ -13,10 +14,14 @@ USING_NS_CC;
 const float kFruitTopMargin = 80.0f;
 const int kFruitSpawnRate = 20;
 const float kTimeLimitSecond = 10.0f;
+const int kNormalFruitScore = 1;
+const int kGoldenFruitScore = 5;
+const int kBombPenaltyScore = -4;
 
 MainScene::MainScene()
 : _fruits(Vector<cocos2d::Sprite*>())
 , _score(0)
+, _isCrash(false)
 , _second(kTimeLimitSecond)
 , _state(GameState::kPlaying)
 , _player(NULL)
@@ -67,6 +72,7 @@ bool MainScene::init()
     listener->onTouchMoved = [this](Touch* touch, Event* event) {
         
         if (_player == NULL) return;
+        if (this->getIsCrash()) return;
         
         // フリックした分だけ移動
         Vec2 position = _player->getPosition();
@@ -211,12 +217,27 @@ bool MainScene::removeFruit(Sprite* fruit)
 
 void MainScene::catchFruit(Sprite* fruit)
 {
+    if (this->getIsCrash()) return;
+    
+    FruitType fruitType = static_cast<FruitType>(fruit->getTag());
+    switch (fruitType) {
+        case MainScene::FruitType::kGolden:
+            _score += kGoldenFruitScore;
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("catch_golden.mp3");
+            break;
+        case MainScene::FruitType::kBomb:
+            this->onCatchBomb();
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("catch_bomb.mp3");
+            break;
+        default:
+            _score += kNormalFruitScore;
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("catch_fruit.mp3");
+            break;
+    }
+    
     this->removeFruit(fruit);
     
-    _score += 1;
     _scoreLabel->setString(StringUtils::toString(_score));
-    
-    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("catch_fruit.mp3");
 }
 
 void MainScene::onResult()
@@ -243,8 +264,11 @@ void MainScene::onResult()
     auto titleButton = MenuItemImage::create("title_button.png",
                                              "title_button_pressed.png",
                                              [](Ref* ref) {
-                                                 // 後で実装する.
                                                  CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("decide.mp3");
+                                                 
+                                                 auto scene = TitleScene::createScene();
+                                                 auto transition = TransitionCrossFade::create(1.0, scene);
+                                                 Director::getInstance()->replaceScene(transition);
                                              });
     auto menu = Menu::create(replayButton, titleButton, NULL);
     menu->alignItemsVerticallyWithPadding(15);
@@ -252,4 +276,41 @@ void MainScene::onResult()
     this->addChild(menu);
     
     CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("finish.mp3");
+}
+
+void MainScene::onCatchBomb()
+{
+    // クラッシュ状態に.
+    _isCrash = true;
+    
+    // 3枚ワンセットの画像を元にアニメーションする.
+    const int animationFrameCount = 3;
+    Vector<SpriteFrame*> frames;
+    auto playerSize = _player->getContentSize();
+    for (int i = 0; i < animationFrameCount; ++i) {
+        auto rect = Rect(playerSize.width * i, 0, playerSize.width, playerSize.height);
+        auto frame = SpriteFrame::create("player_crash.png", rect);
+        frames.pushBack(frame);
+    }
+    
+    // 10フレの * 3枚 * 3回 = 90フレのアニメーション.
+    auto animation = Animation::createWithSpriteFrames(frames, 10.0 / 60.0);
+    animation->setLoops(3);
+    
+    // 終わったら元のスプライトに戻す.
+    animation->setRestoreOriginalFrame(true);
+    
+    // アニメーション再生.
+    auto sequence = Sequence::create(Animate::create(animation),
+                                     CallFunc::create([this]{
+                                         // クラッシュ状態から復帰.
+                                         _isCrash = false;
+                                     }),
+                                     NULL);
+    _player->runAction(sequence);
+    
+    // スコア更新.
+    _score = MAX(0, _score + kBombPenaltyScore);
+    
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("crash.mp3");
 }
