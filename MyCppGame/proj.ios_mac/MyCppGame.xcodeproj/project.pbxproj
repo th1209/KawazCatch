@@ -50,6 +50,7 @@
 		B335228320FC6E8100A1DB8F /* image in Resources */ = {isa = PBXBuildFile; fileRef = B335228220FC6E8100A1DB8F /* image */; };
 		B335228520FC6E8F00A1DB8F /* se in Resources */ = {isa = PBXBuildFile; fileRef = B335228420FC6E8E00A1DB8F /* se */; };
 		B335228720FC6E9600A1DB8F /* bgm in Resources */ = {isa = PBXBuildFile; fileRef = B335228620FC6E9600A1DB8F /* bgm */; };
+		B335230F210C5E4500A1DB8F /* TitleScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B335230D210C5E4500A1DB8F /* TitleScene.cpp */; };
 		BF171245129291EC00B8313A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB012928DE900B8313A /* OpenGLES.framework */; };
 		BF1712471292920000B8313A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF170DB412928DE900B8313A /* libz.dylib */; };
 		BF1C47F01293687400B63C5D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1C47EA1293683800B63C5D /* QuartzCore.framework */; };
@@ -142,6 +143,8 @@
 		B335228220FC6E8100A1DB8F /* image */ = {isa = PBXFileReference; lastKnownFileType = folder; path = image; sourceTree = "<group>"; };
 		B335228420FC6E8E00A1DB8F /* se */ = {isa = PBXFileReference; lastKnownFileType = folder; path = se; sourceTree = "<group>"; };
 		B335228620FC6E9600A1DB8F /* bgm */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bgm; sourceTree = "<group>"; };
+		B335230D210C5E4500A1DB8F /* TitleScene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TitleScene.cpp; sourceTree = "<group>"; };
+		B335230E210C5E4500A1DB8F /* TitleScene.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TitleScene.hpp; sourceTree = "<group>"; };
 		BF170DB012928DE900B8313A /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		BF170DB412928DE900B8313A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		BF1C47EA1293683800B63C5D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -299,6 +302,8 @@
 				46880B8719C43A87006E1F66 /* HelloWorldScene.h */,
 				B335227E20FC68F200A1DB8F /* MainScene.cpp */,
 				B335227F20FC68F200A1DB8F /* MainScene.hpp */,
+				B335230D210C5E4500A1DB8F /* TitleScene.cpp */,
+				B335230E210C5E4500A1DB8F /* TitleScene.hpp */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -471,6 +476,7 @@
 				1AF87B8A1F6F7822007BE51C /* main.m in Sources */,
 				46880B8A19C43A87006E1F66 /* HelloWorldScene.cpp in Sources */,
 				B335228020FC68F200A1DB8F /* MainScene.cpp in Sources */,
+				B335230F210C5E4500A1DB8F /* TitleScene.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
