@@ -327,8 +327,8 @@ bool MainScene::removeFruit(Sprite* fruit)
     if (fruit == NULL) return false;
     if (! _fruits.contains(fruit)) return false;
     
-    fruit->removeFromParent();
     _fruits.eraseObject(fruit);
+    fruit->removeFromParent();
     return true;
 }
 
@@ -361,11 +361,6 @@ void MainScene::onResult()
 {
     // 状態の変更
     _state = GameState::kResult;
-    
-    // フルーツの全削除
-    for (auto fruit : _fruits) {
-        removeFruit(fruit);
-    }
     
     // 各種リセットボタンの表示
     auto winSize = Director::getInstance()->getWinSize();

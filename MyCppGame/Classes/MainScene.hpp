@@ -25,7 +25,7 @@ public:
     static cocos2d::Scene* createScene();
     CREATE_FUNC(MainScene);
 
-    CC_SYNTHESIZE(cocos2d::Vector<cocos2d::Sprite*>, _fruits, Fruits);
+    CC_SYNTHESIZE_PASS_BY_REF(cocos2d::Vector<cocos2d::Sprite*>, _fruits, Fruits);
     CC_SYNTHESIZE(int, _score, Score);
     CC_SYNTHESIZE(float, _second, Second);
     CC_SYNTHESIZE(bool, _isCrash, IsCrash);
