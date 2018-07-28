@@ -8,6 +8,7 @@
 #ifndef MainScene_hpp
 #define MainScene_hpp
 
+#include <random>
 #include "cocos2d.h"
 
 class MainScene : public cocos2d::Layer {
@@ -29,12 +30,13 @@ public:
     CC_SYNTHESIZE(float, _second, Second);
     CC_SYNTHESIZE(bool, _isCrash, IsCrash);
     CC_SYNTHESIZE(GameState, _state, State);
+    CC_SYNTHESIZE(std::mt19937, _engine, Engine);
     CC_SYNTHESIZE_RETAIN(cocos2d::Sprite*, _player, Player);
     CC_SYNTHESIZE_RETAIN(cocos2d::Label*, _scoreLabel, ScoreLabel);
     CC_SYNTHESIZE_RETAIN(cocos2d::Label*, _secondLabel, SecondLabel);
     CC_SYNTHESIZE_RETAIN(cocos2d::SpriteBatchNode*, _fruitBatchNode, FruitBatchNode);
     
-    void update(float delta);
+    void update(float delta) override;
     void onEnterTransitionDidFinish() override;
 
 protected:
@@ -61,6 +63,7 @@ private:
     void catchFruit(cocos2d::Sprite* fruit);
     void onCatchBomb();
     void onResult();
+    float generateRandom(float min, float max);
 };
 
 #endif /* MainScene_hpp */

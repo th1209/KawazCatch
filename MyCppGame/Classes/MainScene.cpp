@@ -11,13 +11,34 @@
 
 USING_NS_CC;
 
+// 描画位置に関する定数群
 const float kFruitTopMargin = 80.0f;
-const int kFruitSpawnRate = 20;
-const float kTimeLimitSecond = 10.0f;
+
+// 制限時間
+const float kTimeLimitSecond = 60.0f;
+
+// スコアに関する定数群
 const int kNormalFruitScore = 1;
 const int kGoldenFruitScore = 5;
 const int kBombPenaltyScore = -4;
+
+// UserDefalultのキー値に関する定数群
 const char* kHighScoreKey = "highScoreKey";
+
+// 毎フレのフルーツ生成確率に関する定数群
+const float kFruitSpawnIncreaseBase = 0.02f;
+const float kFruitSpawnIncreateRate = 1.05f;
+const float kMaximumSpawnProbability = 0.5f;
+
+// どのフルーツを生成するかの確率に関する定数群
+const int kFruitSpawnRate = 20;
+const float kGoldenFruitProbabilityBase = 0.02f;
+const float kGoldenFruitProbabilityRate = 0.001f;
+const float kBombProbabilityBase = 0.05f;
+const float kBombProbabilityRate = 0.003f;
+
+// フルーツの個数
+const int kNormalFruitCount = 5;
 
 MainScene::MainScene()
 : _fruits(Vector<cocos2d::Sprite*>())
@@ -25,11 +46,14 @@ MainScene::MainScene()
 , _isCrash(false)
 , _second(kTimeLimitSecond)
 , _state(GameState::kReady)
+, _engine()
 , _player(NULL)
 , _scoreLabel(NULL)
 , _secondLabel(NULL)
 , _fruitBatchNode(NULL)
 {
+    std::random_device rdev;
+    _engine.seed(rdev());
 }
 
 MainScene::~MainScene()
@@ -143,8 +167,11 @@ void MainScene::update(float delta)
 {
     if (_state == GameState::kPlaying) {
         // フルーツの生成
-        int random = rand() % kFruitSpawnRate;
-        if (random == 0) {
+        float pastTime = kTimeLimitSecond - _second;
+        float p = kFruitSpawnIncreaseBase * (1 + powf(kGoldenFruitProbabilityRate, pastTime));
+        p = MIN(p, kMaximumSpawnProbability);
+        float random = this->generateRandom(0.0f, 1.0f);
+        if (random < p) {
             this->addFruit();
         }
         
@@ -239,8 +266,22 @@ Sprite* MainScene::addFruit()
         return nullptr;
     }
     
-    // フルーツをランダム生成
-    int fruitType = rand() % static_cast<int>(FruitType::kCount);
+    // 経過秒数に応じて、出現するフルーツを変動させる.
+    //int fruitType = rand() % static_cast<int>(FruitType::kCount);
+    int fruitType = 0;
+    float r = this->generateRandom(0.0f, 1.0f);
+    int pastSecond = kTimeLimitSecond - _second;
+    float goldenFruitProbability = kGoldenFruitProbabilityBase + kGoldenFruitProbabilityRate * pastSecond;
+    float bombProbability = kBombProbabilityBase + kBombProbabilityRate * pastSecond;
+    if (r <= goldenFruitProbability) {
+        fruitType = static_cast<int>(FruitType::kGolden);
+    }else if (r <= bombProbability) {
+        fruitType = static_cast<int>(FruitType::kBomb);
+    }else {
+        fruitType = static_cast<int>(floor(this->generateRandom(0, kNormalFruitCount)));
+    }
+    
+    // フルーツを生成
     auto textureSize = _fruitBatchNode->getTextureAtlas()->getTexture()->getContentSize();
     auto fruitWidth = textureSize.width / static_cast<int>(FruitType::kCount);
     auto fruit = Sprite::create("fruits.png", Rect(fruitWidth * fruitType, 0, fruitWidth, textureSize.height));
@@ -396,4 +437,11 @@ void MainScene::onCatchBomb()
     _score = MAX(0, _score + kBombPenaltyScore);
     
     CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("crash.mp3");
+}
+
+float MainScene::generateRandom(float min, float max)
+{
+    // 連続一様分布で乱数を生成(min以上、max未満).
+    std::uniform_real_distribution<float> dist(min, max);
+    return dist(_engine);
 }
