@@ -17,6 +17,7 @@ const float kTimeLimitSecond = 10.0f;
 const int kNormalFruitScore = 1;
 const int kGoldenFruitScore = 5;
 const int kBombPenaltyScore = -4;
+const char* kHighScoreKey = "highScoreKey";
 
 MainScene::MainScene()
 : _fruits(Vector<cocos2d::Sprite*>())
@@ -349,6 +350,13 @@ void MainScene::onResult()
     menu->alignItemsVerticallyWithPadding(15);
     menu->setPosition(Vec2(winSize.width / 2.0f, winSize.height / 2.0f));
     this->addChild(menu);
+    
+    // ハイスコアの更新
+    auto userDefault = UserDefault::getInstance();
+    int highScore = userDefault->getIntegerForKey(kHighScoreKey);
+    if (_score > highScore) {
+        userDefault->setIntegerForKey(kHighScoreKey, _score);
+    }
     
     CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("finish.mp3");
 }
