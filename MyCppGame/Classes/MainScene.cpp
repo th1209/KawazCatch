@@ -13,7 +13,7 @@ USING_NS_CC;
 
 const float kFruitTopMargin = 80.0f;
 const int kFruitSpawnRate = 20;
-const float kTimeLimitSecond = 2.0f;
+const float kTimeLimitSecond = 10.0f;
 const int kNormalFruitScore = 1;
 const int kGoldenFruitScore = 5;
 const int kBombPenaltyScore = -4;
@@ -27,6 +27,7 @@ MainScene::MainScene()
 , _player(NULL)
 , _scoreLabel(NULL)
 , _secondLabel(NULL)
+, _fruitBatchNode(NULL)
 {
 }
 
@@ -35,6 +36,7 @@ MainScene::~MainScene()
     CC_SAFE_RELEASE_NULL(_player);
     CC_SAFE_RELEASE_NULL(_scoreLabel);
     CC_SAFE_RELEASE_NULL(_secondLabel);
+    CC_SAFE_RELEASE_NULL(_fruitBatchNode);
 }
 
 Scene* MainScene::createScene()
@@ -123,6 +125,12 @@ bool MainScene::init()
     secondLabelHeader->setPosition(Vec2(winSize.width / 2.0f, winSize.height - 120));
     this->addChild(secondLabelHeader);
     
+    // BatchNode(フルーツ)
+    _fruitBatchNode = SpriteBatchNode::create("fruits.png");
+    if (_fruitBatchNode == nullptr) {
+        return false;
+    }
+    this->addChild(_fruitBatchNode);
     
     // 毎フレupdateを呼ぶ
     this->scheduleUpdate();
@@ -226,10 +234,15 @@ void MainScene::addReadyLabel()
 
 Sprite* MainScene::addFruit()
 {
+    if (_fruitBatchNode == nullptr) {
+        return nullptr;
+    }
+    
     // フルーツをランダム生成
     int fruitType = rand() % static_cast<int>(FruitType::kCount);
-    std::string fileName = StringUtils::format("fruit%d.png", fruitType);
-    auto fruit = Sprite::create(fileName);
+    auto textureSize = _fruitBatchNode->getTextureAtlas()->getTexture()->getContentSize();
+    auto fruitWidth = textureSize.width / static_cast<int>(FruitType::kCount);
+    auto fruit = Sprite::create("fruits.png", Rect(fruitWidth * fruitType, 0, fruitWidth, textureSize.height));
     if (fruit == NULL) {
         return NULL;
     }
@@ -241,7 +254,7 @@ Sprite* MainScene::addFruit()
     float fruitXPos = rand() % static_cast<int>(winSize.width);
     fruit->setPosition(Vec2(fruitXPos, winSize.height - kFruitTopMargin));
     
-    this->addChild(fruit);
+    _fruitBatchNode->addChild(fruit);
     _fruits.pushBack(fruit);
     
     // 落下 & 削除の動きを付ける

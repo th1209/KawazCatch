@@ -32,6 +32,7 @@ public:
     CC_SYNTHESIZE_RETAIN(cocos2d::Sprite*, _player, Player);
     CC_SYNTHESIZE_RETAIN(cocos2d::Label*, _scoreLabel, ScoreLabel);
     CC_SYNTHESIZE_RETAIN(cocos2d::Label*, _secondLabel, SecondLabel);
+    CC_SYNTHESIZE_RETAIN(cocos2d::SpriteBatchNode*, _fruitBatchNode, FruitBatchNode);
     
     void update(float delta);
     void onEnterTransitionDidFinish() override;
