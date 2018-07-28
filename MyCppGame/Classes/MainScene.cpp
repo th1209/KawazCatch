@@ -257,7 +257,8 @@ Sprite* MainScene::addFruit()
     _fruitBatchNode->addChild(fruit);
     _fruits.pushBack(fruit);
     
-    // 落下 & 削除の動きを付ける
+    // アニメーションを付けながら、落下開始.
+    fruit->setScale(0.0f);
     auto ground = Vec2(fruitXPos, 0);
     auto fall = MoveTo::create(3, ground);
     auto remove = CallFuncN::create([this](Node* node) {
@@ -265,7 +266,15 @@ Sprite* MainScene::addFruit()
         if (sprite == NULL) return;
         this->removeFruit(sprite);
     });
-    auto sequence = Sequence::create(fall, remove, NULL);
+    auto swing = Repeat::create(Sequence::create(RotateTo::create(0.25f, -30),
+                                                 RotateTo::create(0.25f, 30),
+                                                 NULL), 2);
+    auto sequence = Sequence::create(ScaleTo::create(0.25f, 1.0f),
+                                     swing,
+                                     RotateTo::create(0.125f, 0),
+                                     fall,
+                                     remove,
+                                     NULL);
     fruit->runAction(sequence);
     
     return fruit;
