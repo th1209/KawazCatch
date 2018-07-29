@@ -31,7 +31,6 @@ const float kFruitSpawnIncreateRate = 1.05f;
 const float kMaximumSpawnProbability = 0.5f;
 
 // どのフルーツを生成するかの確率に関する定数群
-const int kFruitSpawnRate = 20;
 const float kGoldenFruitProbabilityBase = 0.02f;
 const float kGoldenFruitProbabilityRate = 0.001f;
 const float kBombProbabilityBase = 0.05f;
@@ -179,7 +178,7 @@ void MainScene::update(float delta)
     if (_state == GameState::kPlaying) {
         // フルーツの生成
         float pastTime = kTimeLimitSecond - _second;
-        float p = kFruitSpawnIncreaseBase * (1 + powf(kGoldenFruitProbabilityRate, pastTime));
+        float p = kFruitSpawnIncreaseBase * (1 + powf(kFruitSpawnIncreateRate, pastTime));
         p = MIN(p, kMaximumSpawnProbability);
         float random = this->generateRandom(0.0f, 1.0f);
         if (random < p) {
