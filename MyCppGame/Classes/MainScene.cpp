@@ -62,6 +62,17 @@ MainScene::~MainScene()
     CC_SAFE_RELEASE_NULL(_scoreLabel);
     CC_SAFE_RELEASE_NULL(_secondLabel);
     CC_SAFE_RELEASE_NULL(_fruitBatchNode);
+    
+    // ↓ 何かのVectorのデストラクタ内処理にて、要素のリファレンスカウンタが0になっており、Assertで死ぬ問題があるので、ロギング処理を残しておく.
+    // 分かっていること:
+    // ・fruitをBatchNodeで生成するようになってから死んだっぽい? (1、2回しか確認していない)
+    // ・以下の理由から、fruitのvectorが原因で落ちているとは思えない。
+    //   ・要素が0の際も、要素のassertで死んでいる。
+    //   ・要素が1以上の際も、死んだ際の要素(Ref*)のidとfruitのidは異なっていた。また、死んだ要素は以上に_IDの値が大きい。_fruitはせいぜい数百番台。
+    CCLOG("destruct start. count:%d", _fruits.size());
+    for (auto& fruit : _fruits) {
+        CCLOG("destruct start. id:%d", fruit->_ID);
+    }
 }
 
 Scene* MainScene::createScene()
